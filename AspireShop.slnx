@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/Infrastructure/">
+    <Project Path="AspireShop.AppHost/AspireShop.AppHost.csproj" />
+    <Project Path="AspireShop.ServiceDefaults/AspireShop.ServiceDefaults.csproj" />
+  </Folder>
+  <Folder Name="/Src/">
+    <Project Path="AspireShop.Api.Catalog/AspireShop.Api.Catalog.csproj" />
+    <Project Path="AspireShop.Web/AspireShop.Web.csproj" />
+  </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="AspireShop.Tests/AspireShop.Tests.csproj" />
+  </Folder>
+</Solution>

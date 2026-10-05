@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AspireShop.ServiceDefaults\AspireShop.ServiceDefaults.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Aspire.StackExchange.Redis.OutputCaching" Version="13.6.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <TailwindInputs Include="$(MSBuildProjectDirectory)\Styles\**\*" />
+    <TailwindInputs Include="$(MSBuildProjectDirectory)\Components\**\*.razor" />
+    <TailwindInputs Include="$(MSBuildProjectDirectory)\package.json" />
+    <TailwindInputs Include="$(MSBuildProjectDirectory)\package-lock.json" />
+  </ItemGroup>
+
+  <Target Name="InstallFrontendDependencies" BeforeTargets="Build" Inputs="$(MSBuildProjectDirectory)\package.json;$(MSBuildProjectDirectory)\package-lock.json" Outputs="$(MSBuildProjectDirectory)\node_modules\.aspire-shop-install.stamp" Condition="'$(DesignTimeBuild)' != 'true'">
+    <Message Importance="high" Text="Installing frontend dependencies..." />
+
+    <Exec Command="npm install --no-audit --no-fund" WorkingDirectory="$(MSBuildProjectDirectory)" />
+    <Touch Files="$(MSBuildProjectDirectory)\node_modules\.aspire-shop-install.stamp" AlwaysCreate="true" />
+  </Target>
+
+  <Target Name="BuildTailwind" BeforeTargets="Build" DependsOnTargets="InstallFrontendDependencies" Inputs="@(TailwindInputs)" Outputs="$(MSBuildProjectDirectory)\wwwroot\css\tailwind.css" Condition="'$(DesignTimeBuild)' != 'true'">
+    <Message Importance="high" Text="Building Tailwind CSS..." />
+    <Exec Command="npm run build:css" WorkingDirectory="$(MSBuildProjectDirectory)" />
+  </Target>
+
+</Project>

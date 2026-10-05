@@ -1,0 +1,39 @@
+# Build output
+bin/
+obj/
+[Dd]ebug/
+[Rr]elease/
+
+# Visual Studio and editor files
+.vs/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Local application configuration and secrets
+# Keep appsettings.json tracked; ignore environment/local variants.
+appsettings.*
+!appsettings.json
+secrets.json
+*.local.json
+
+# Frontend dependencies and generated Tailwind output
+node_modules/
+
+# Aspire and local tooling state
+.azure/
+.env
+.env.*
+!.env.example
+
+# Test and coverage artifacts
+TestResults/
+coverage/
+*.coverage
+*.coveragexml
+
+# OS files
+.DS_Store
+Thumbs.db
