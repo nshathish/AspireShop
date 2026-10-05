@@ -1,6 +1,7 @@
 using AspireShop.Api.Catalog.Application.Products.Services;
 using AspireShop.Api.Catalog.Application.Categories.Services;
 using AspireShop.Api.Catalog.Application.ProductPrices.Services;
+using AspireShop.Api.Catalog.Common;
 using AspireShop.Api.Catalog.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,6 +20,22 @@ public static class DependencyInjection
         services.AddStackExchangeRedisCache(options =>
         {
             options.Configuration = configuration.GetConnectionString("cache");
+        });
+
+        services.AddCors(options =>
+        {
+            options.AddPolicy(CorsPolicies.Admin, policy =>
+            {
+                var adminOrigin =
+                    configuration["Cors:WebAdminOrigin"];
+
+                Console.WriteLine($"Admin Origin: {adminOrigin}");
+
+                policy
+                    .WithOrigins(adminOrigin!)
+                    .AllowAnyHeader()
+                    .AllowAnyMethod();
+            });
         });
 
         services.AddScoped<ProductService>();
