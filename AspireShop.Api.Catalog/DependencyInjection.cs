@@ -1,4 +1,6 @@
 using AspireShop.Api.Catalog.Application.Products.Services;
+using AspireShop.Api.Catalog.Application.Categories.Services;
+using AspireShop.Api.Catalog.Application.ProductPrices.Services;
 using AspireShop.Api.Catalog.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,6 +23,8 @@ public static class DependencyInjection
 
         services.AddScoped<ProductService>();
         services.AddScoped<ProductCacheService>();
+        services.AddScoped<CategoryService>();
+        services.AddScoped<ProductPriceService>();
 
         return services;
     }

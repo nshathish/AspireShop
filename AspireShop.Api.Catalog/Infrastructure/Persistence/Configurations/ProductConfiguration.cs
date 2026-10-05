@@ -14,6 +14,9 @@ public sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
             .IsRequired()
             .HasMaxLength(200);
 
+        builder.Property(p => p.ImageUrl)
+            .HasMaxLength(2048);
+
         builder.Property(p => p.Price)
             .HasPrecision(18, 2);
 

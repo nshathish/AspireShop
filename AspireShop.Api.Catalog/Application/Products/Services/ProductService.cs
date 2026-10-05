@@ -20,8 +20,10 @@ public sealed class ProductService(CatalogDbContext dbContext, ProductCacheServi
             .Select(p => new ProductResponse(
                 p.Id,
                 p.Name,
+                p.ImageUrl,
                 p.Price,
-                p.Stock))
+                p.Stock,
+                p.CategoryId))
             .ToListAsync(cancellationToken);
 
         await cache.SetAllAsync(products, cancellationToken);
@@ -43,7 +45,7 @@ public sealed class ProductService(CatalogDbContext dbContext, ProductCacheServi
         if (product is null)
             return null;
 
-        var result = new ProductResponse(product.Id, product.Name, product.Price, product.Stock);
+        var result = new ProductResponse(product.Id, product.Name, product.ImageUrl, product.Price, product.Stock, product.CategoryId);
         await cache.SetByIdAsync(result, cancellationToken);
 
         return result;
@@ -58,19 +60,26 @@ public sealed class ProductService(CatalogDbContext dbContext, ProductCacheServi
             return ProductOperationResult<ProductResponse>.ValidationFailed("Name is required");
         }
 
+        if (request.CategoryId.HasValue && !await dbContext.Categories.AnyAsync(category => category.Id == request.CategoryId, cancellationToken))
+        {
+            return ProductOperationResult<ProductResponse>.ValidationFailed("Category not found");
+        }
+
         var product = new Product
         {
             Id = Guid.NewGuid(),
             Name = request.Name,
+            ImageUrl = request.ImageUrl,
             Price = request.Price,
-            Stock = request.Stock
+            Stock = request.Stock,
+            CategoryId = request.CategoryId
         };
 
         await dbContext.Products.AddAsync(product, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
         await cache.RemoveAllAsync(cancellationToken);
 
-        var response = new ProductResponse(product.Id, product.Name, product.Price, product.Stock);
+        var response = new ProductResponse(product.Id, product.Name, product.ImageUrl, product.Price, product.Stock, product.CategoryId);
         return ProductOperationResult<ProductResponse>.Success(response);
     }
 
@@ -84,14 +93,21 @@ public sealed class ProductService(CatalogDbContext dbContext, ProductCacheServi
             return ProductOperationResult.ValidationFailed("Name is required");
         }
 
+        if (request.CategoryId.HasValue && !await dbContext.Categories.AnyAsync(category => category.Id == request.CategoryId, cancellationToken))
+        {
+            return ProductOperationResult.ValidationFailed("Category not found");
+        }
+
         var product = await dbContext.Products.FindAsync([id], cancellationToken);
 
         if (product is null)
             return ProductOperationResult.NotFound();
 
         product.Name = request.Name;
+        product.ImageUrl = request.ImageUrl;
         product.Price = request.Price;
         product.Stock = request.Stock;
+        product.CategoryId = request.CategoryId;
 
         await dbContext.SaveChangesAsync(cancellationToken);
         await cache.RemoveByIdAsync(id, cancellationToken);

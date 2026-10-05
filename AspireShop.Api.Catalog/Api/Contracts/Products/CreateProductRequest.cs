@@ -4,4 +4,5 @@ public sealed record CreateProductRequest(
     string Name,
     decimal Price,
     int Stock,
-    Guid? CategoryId = null);
+    Guid? CategoryId = null,
+    string? ImageUrl = null);

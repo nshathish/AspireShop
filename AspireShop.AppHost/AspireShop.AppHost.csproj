@@ -12,7 +12,7 @@
   <ItemGroup>
     <ProjectReference Include="..\AspireShop.Api.Catalog\AspireShop.Api.Catalog.csproj" />
     <ProjectReference Include="..\AspireShop.Api.Orders\AspireShop.Api.Orders.csproj" />
-    <ProjectReference Include="..\AspireShop.Web\AspireShop.Web.csproj" />
+    <ProjectReference Include="..\AspireShop.Web.Store\AspireShop.Web.Store.csproj" />
   </ItemGroup>
 
   <ItemGroup>

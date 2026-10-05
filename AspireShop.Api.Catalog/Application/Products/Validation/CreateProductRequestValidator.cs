@@ -17,5 +17,11 @@ public sealed class CreateProductRequestValidator
 
         RuleFor(x => x.Stock)
             .GreaterThanOrEqualTo(0);
+
+        RuleFor(x => x.ImageUrl)
+            .MaximumLength(2048)
+            .Must(url => Uri.TryCreate(url, UriKind.Absolute, out _))
+            .When(x => !string.IsNullOrWhiteSpace(x.ImageUrl))
+            .WithMessage("ImageUrl must be a valid absolute URL.");
     }
 }

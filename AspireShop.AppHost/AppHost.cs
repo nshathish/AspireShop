@@ -18,6 +18,7 @@ var catalogApi = builder
     .WaitFor(catalogDb)
     .WithReference(cache)
     .WaitFor(cache)
+    // .WithExternalHttpEndpoints()
     .WithHttpHealthCheck("/health");
 
 var catalogMigrations = catalogApi
@@ -35,6 +36,7 @@ var ordersApi = builder
     .WaitFor(messaging)
     .WithReference(cache)
     .WaitFor(cache)
+    // .WithExternalHttpEndpoints()
     .WithHttpHealthCheck("/health");
 
 var ordersMigrations = ordersApi
@@ -45,7 +47,7 @@ var ordersMigrations = ordersApi
 ordersApi.WaitForCompletion(ordersMigrations);
 
 builder
-    .AddProject<Projects.AspireShop_Web>("webfrontend")
+    .AddProject<Projects.AspireShop_Web_Store>("webfrontend")
     .WithExternalHttpEndpoints()
     .WithHttpHealthCheck("/health")
     .WithReference(cache)
