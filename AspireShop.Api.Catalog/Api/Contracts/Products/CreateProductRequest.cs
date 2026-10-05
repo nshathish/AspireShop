@@ -3,4 +3,5 @@
 public sealed record CreateProductRequest(
     string Name,
     decimal Price,
-    int Stock);
+    int Stock,
+    Guid? CategoryId = null);

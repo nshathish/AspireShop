@@ -1,8 +1,8 @@
-using AspireShop.Api.Catalog.Application.Products.Services;
-using AspireShop.Api.Catalog.Infrastructure.Persistence;
+using AspireShop.Api.Orders.Application.Orders.Services;
+using AspireShop.Api.Orders.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
-namespace AspireShop.Api.Catalog;
+namespace AspireShop.Api.Orders;
 
 public static class DependencyInjection
 {
@@ -10,18 +10,14 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddDbContext<CatalogDbContext>(options =>
-            options.UseNpgsql(
-                configuration.GetConnectionString("catalogdb")));
+        services.AddDbContext<OrderDbContext>(options =>
+            options.UseNpgsql(configuration.GetConnectionString("ordersdb")));
 
         services.AddStackExchangeRedisCache(options =>
         {
             options.Configuration = configuration.GetConnectionString("cache");
         });
-
-        services.AddScoped<ProductService>();
-        services.AddScoped<ProductCacheService>();
-
+        
         return services;
     }
 }

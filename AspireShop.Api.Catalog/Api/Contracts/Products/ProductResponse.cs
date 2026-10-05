@@ -4,4 +4,5 @@ public record ProductResponse(
     Guid Id,
     string Name,
     decimal Price,
-    int Stock);
+    int Stock,
+    Guid? CategoryId);

@@ -1,9 +1,8 @@
 ﻿using AspireShop.Api.Catalog.Api.Contracts.Products;
-using AspireShop.Api.Catalog.Infrastructure.Persistence;
+using AspireShop.Api.Catalog.Application.Products.Services;
+using FluentValidation;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-
 
 namespace AspireShop.Api.Catalog.Api.Endpoints;
 
@@ -33,32 +32,37 @@ public static class ProductEndpoints
             .WithName("CreateProduct")
             .WithSummary("Creates a new product");
 
+        group.MapPut("/{id}", UpdateProduct)
+            .Accepts<CreateProductRequest>("application/json")
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces<ProblemDetails>(StatusCodes.Status404NotFound)
+            .Produces<ProblemDetails>(StatusCodes.Status400BadRequest)
+            .WithName("UpdateProduct")
+            .WithSummary("Updates an existing product");
+
+        group.MapDelete("/{id}", DeleteProduct)
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces<ProblemDetails>(StatusCodes.Status404NotFound)
+            .WithName("DeleteProduct")
+            .WithSummary("Deletes a product by its ID");
+
         return endpoints;
     }
 
-    private static async Task<Ok<IEnumerable<ProductResponse>>> GetAllProducts(
-        CatalogDbContext dbContext,
+    private static async Task<Ok<List<ProductResponse>>> GetAllProducts(
+        ProductService productService,
         CancellationToken cancellationToken = default)
     {
-        var products = await dbContext.Products
-            .AsNoTracking()
-            .ToListAsync(cancellationToken);
-
-        var response = products.Select(p => new ProductResponse(
-            p.Id,
-            p.Name,
-            p.Price,
-            p.Stock));
-
-        return TypedResults.Ok(response);
+        var results = await productService.GetAllAsync(cancellationToken);
+        return TypedResults.Ok(results);
     }
 
     private static async Task<Results<Ok<ProductResponse>, NotFound<ProblemDetails>>> GetProductById(
         Guid id,
-        CatalogDbContext dbContext,
+        ProductService productService,
         CancellationToken cancellationToken = default)
     {
-        var product = await dbContext.Products.FindAsync([id], cancellationToken);
+        var product = await productService.GetByIdAsync(id, cancellationToken);
 
         if (product is null)
             return TypedResults.NotFound(new ProblemDetails
@@ -67,37 +71,74 @@ public static class ProductEndpoints
                 Status = StatusCodes.Status404NotFound
             });
 
-        var response = new ProductResponse(product.Id, product.Name, product.Price, product.Stock);
-
-        return TypedResults.Ok(response);
+        return TypedResults.Ok(product);
     }
 
-    private static async Task<Results<Created<ProductResponse>, BadRequest<ProblemDetails>>> CreateProduct(
-        CreateProductRequest request,
-        CatalogDbContext dbContext,
-        CancellationToken cancellationToken = default)
+    private static async Task<Results<Created<ProductResponse>, ValidationProblem, BadRequest<ProblemDetails>>>
+        CreateProduct(
+            CreateProductRequest request,
+            IValidator<CreateProductRequest> validator,
+            ProductService productService,
+            CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(request.Name))
+        var validationResult = await validator.ValidateAsync(request, cancellationToken);
+        if (!validationResult.IsValid)
+            return TypedResults.ValidationProblem(validationResult.ToDictionary());
+
+        var result = await productService.CreateAsync(request, cancellationToken);
+
+        if (!result.IsSuccess)
             return TypedResults.BadRequest(new ProblemDetails
             {
-                Title = "Name is required",
+                Title = result.ValidationError,
                 Status = StatusCodes.Status400BadRequest
             });
 
-        var product = new Domain.Entities.Product
-        {
-            Id = Guid.NewGuid(),
-            Name = request.Name,
-            Price = request.Price,
-            Stock = request.Stock
-        };
+        var response = result.Value!;
+        var uri = $"/api/products/{response.Id}";
 
-        await dbContext.Products.AddAsync(product, cancellationToken);
-        await dbContext.SaveChangesAsync(cancellationToken);
-
-        var response = new ProductResponse(product.Id, product.Name, product.Price, product.Stock);
-
-        var uri = $"/api/products/{product.Id}";
         return TypedResults.Created(uri, response);
+    }
+
+    private static async Task<Results<NoContent, NotFound<ProblemDetails>, BadRequest<ProblemDetails>>> UpdateProduct(
+        Guid id,
+        CreateProductRequest request,
+        ProductService productService,
+        CancellationToken cancellationToken = default)
+    {
+        var result = await productService.UpdateAsync(id, request, cancellationToken);
+
+        if (result.IsNotFound)
+            return TypedResults.NotFound(new ProblemDetails
+            {
+                Title = "Product not found",
+                Status = StatusCodes.Status404NotFound
+            });
+
+        if (!result.IsSuccess)
+            return TypedResults.BadRequest(new ProblemDetails
+            {
+                Title = result.ValidationError,
+                Status = StatusCodes.Status400BadRequest
+            });
+
+        return TypedResults.NoContent();
+    }
+
+    private static async Task<Results<NoContent, NotFound<ProblemDetails>>> DeleteProduct(
+        Guid id,
+        ProductService productService,
+        CancellationToken cancellationToken = default)
+    {
+        var result = await productService.DeleteAsync(id, cancellationToken);
+
+        if (!result.IsSuccess)
+            return TypedResults.NotFound(new ProblemDetails
+            {
+                Title = "Product not found",
+                Status = StatusCodes.Status404NotFound
+            });
+
+        return TypedResults.NoContent();
     }
 }
