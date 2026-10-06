@@ -45,14 +45,17 @@ public static class CategoryEndpoints
         return endpoints;
     }
 
-    private static async Task<Ok<List<CategoryResponse>>> GetAll(CategoryService service, CancellationToken cancellationToken = default)
+    private static async Task<Ok<List<CategoryResponse>>> GetAll(CategoryService service,
+        CancellationToken cancellationToken)
         => TypedResults.Ok(await service.GetAllAsync(cancellationToken));
 
-    private static async Task<Results<Ok<CategoryResponse>, NotFound<ProblemDetails>>> GetById(Guid id, CategoryService service, CancellationToken cancellationToken = default)
+    private static async Task<Results<Ok<CategoryResponse>, NotFound<ProblemDetails>>> GetById(Guid id,
+        CategoryService service, CancellationToken cancellationToken)
     {
         var result = await service.GetByIdAsync(id, cancellationToken);
         return result is null
-            ? TypedResults.NotFound(new ProblemDetails { Title = "Category not found", Status = StatusCodes.Status404NotFound })
+            ? TypedResults.NotFound(new ProblemDetails
+                { Title = "Category not found", Status = StatusCodes.Status404NotFound })
             : TypedResults.Ok(result);
     }
 
@@ -60,7 +63,7 @@ public static class CategoryEndpoints
         CreateCategoryRequest request,
         IValidator<CreateCategoryRequest> validator,
         CategoryService service,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
         var validation = await validator.ValidateAsync(request, cancellationToken);
         if (!validation.IsValid)
@@ -68,17 +71,19 @@ public static class CategoryEndpoints
 
         var result = await service.CreateAsync(request, cancellationToken);
         if (!result.IsSuccess)
-            return TypedResults.BadRequest(new ProblemDetails { Title = result.Error, Status = StatusCodes.Status400BadRequest });
+            return TypedResults.BadRequest(new ProblemDetails
+                { Title = result.Error, Status = StatusCodes.Status400BadRequest });
 
         return TypedResults.Created($"/api/categories/{result.Value!.Id}", result.Value);
     }
 
-    private static async Task<Results<NoContent, ValidationProblem, NotFound<ProblemDetails>, BadRequest<ProblemDetails>>> Update(
-        Guid id,
-        CreateCategoryRequest request,
-        IValidator<CreateCategoryRequest> validator,
-        CategoryService service,
-        CancellationToken cancellationToken = default)
+    private static async
+        Task<Results<NoContent, ValidationProblem, NotFound<ProblemDetails>, BadRequest<ProblemDetails>>> Update(
+            Guid id,
+            CreateCategoryRequest request,
+            IValidator<CreateCategoryRequest> validator,
+            CategoryService service,
+            CancellationToken cancellationToken)
     {
         var validation = await validator.ValidateAsync(request, cancellationToken);
         if (!validation.IsValid)
@@ -86,18 +91,22 @@ public static class CategoryEndpoints
 
         var result = await service.UpdateAsync(id, request, cancellationToken);
         if (result.IsNotFound)
-            return TypedResults.NotFound(new ProblemDetails { Title = "Category not found", Status = StatusCodes.Status404NotFound });
+            return TypedResults.NotFound(new ProblemDetails
+                { Title = "Category not found", Status = StatusCodes.Status404NotFound });
         if (!result.IsSuccess)
-            return TypedResults.BadRequest(new ProblemDetails { Title = result.Error, Status = StatusCodes.Status400BadRequest });
+            return TypedResults.BadRequest(new ProblemDetails
+                { Title = result.Error, Status = StatusCodes.Status400BadRequest });
 
         return TypedResults.NoContent();
     }
 
-    private static async Task<Results<NoContent, NotFound<ProblemDetails>>> Delete(Guid id, CategoryService service, CancellationToken cancellationToken = default)
+    private static async Task<Results<NoContent, NotFound<ProblemDetails>>> Delete(Guid id, CategoryService service,
+        CancellationToken cancellationToken)
     {
         var result = await service.DeleteAsync(id, cancellationToken);
         return result.IsNotFound
-            ? TypedResults.NotFound(new ProblemDetails { Title = "Category not found", Status = StatusCodes.Status404NotFound })
+            ? TypedResults.NotFound(new ProblemDetails
+                { Title = "Category not found", Status = StatusCodes.Status404NotFound })
             : TypedResults.NoContent();
     }
 }

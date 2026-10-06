@@ -18,7 +18,6 @@ var catalogApi = builder
     .WaitFor(catalogDb)
     .WithReference(cache)
     .WaitFor(cache)
-    // .WithExternalHttpEndpoints()
     .WithHttpHealthCheck("/health");
 
 var catalogMigrations = catalogApi
@@ -36,7 +35,6 @@ var ordersApi = builder
     .WaitFor(messaging)
     .WithReference(cache)
     .WaitFor(cache)
-    // .WithExternalHttpEndpoints()
     .WithHttpHealthCheck("/health");
 
 var ordersMigrations = ordersApi
@@ -54,5 +52,18 @@ builder
     .WaitFor(cache)
     .WithReference(catalogApi)
     .WaitFor(catalogApi);
+
+builder
+    .AddViteApp(
+        "aspireshop-web-admin",
+        "../aspireshop-web-admin")
+    .WithPnpm()
+    .WithEndpoint("http", endpoint => endpoint.Port = 5173)
+    .WithReference(catalogApi)
+    .WithEnvironment(
+        "VITE_CATALOG_API_URL",
+        catalogApi.GetEndpoint("https"))
+    .WaitFor(catalogApi);
+
 
 builder.Build().Run();
