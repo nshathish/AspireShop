@@ -18,6 +18,7 @@ public sealed class CreateOrderRequestValidator
             .MaximumLength(320);
 
         RuleFor(order => order.Total)
-            .GreaterThan(0);
+            .GreaterThan(0)
+            .PrecisionScale(18, 2, true);
     }
 }

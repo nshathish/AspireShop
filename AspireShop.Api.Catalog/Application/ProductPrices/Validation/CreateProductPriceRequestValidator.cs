@@ -8,11 +8,16 @@ public sealed class CreateProductPriceRequestValidator : AbstractValidator<Creat
     public CreateProductPriceRequestValidator()
     {
         RuleFor(price => price.ProductId).NotEmpty();
-        RuleFor(price => price.Amount).GreaterThan(0);
+
+        RuleFor(price => price.Amount)
+            .GreaterThan(0)
+            .PrecisionScale(18, 2, true);
+
         RuleFor(price => price.Currency)
             .NotEmpty()
             .Length(3)
             .Matches("^[A-Za-z]{3}$");
+
         RuleFor(price => price.ValidTo)
             .GreaterThan(price => price.ValidFrom)
             .When(price => price.ValidTo.HasValue);

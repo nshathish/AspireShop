@@ -13,7 +13,8 @@ public sealed class CreateProductRequestValidator
             .MaximumLength(200);
 
         RuleFor(x => x.Price)
-            .GreaterThan(0);
+            .GreaterThan(0)
+            .PrecisionScale(18, 2, true);
 
         RuleFor(x => x.Stock)
             .GreaterThanOrEqualTo(0);
@@ -21,7 +22,8 @@ public sealed class CreateProductRequestValidator
         RuleFor(x => x.ImageUrl)
             .MaximumLength(2048)
             .Must(url => Uri.TryCreate(url, UriKind.Absolute, out _))
-            .When(x => !string.IsNullOrWhiteSpace(x.ImageUrl))
+            .When(x => !string.IsNullOrWhiteSpace(x.ImageUrl),
+                ApplyConditionTo.CurrentValidator)
             .WithMessage("ImageUrl must be a valid absolute URL.");
     }
 }

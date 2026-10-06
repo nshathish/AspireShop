@@ -37,3 +37,8 @@ coverage/
 # OS files
 .DS_Store
 Thumbs.db
+
+# LLM instructions
+.agents/designs/
+.agents/tasks/
+.docs/
