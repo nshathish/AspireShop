@@ -11,12 +11,14 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AspireShop.Api.Catalog\AspireShop.Api.Catalog.csproj" />
-    <ProjectReference Include="..\AspireShop.Web\AspireShop.Web.csproj" />
+    <ProjectReference Include="..\AspireShop.Api.Orders\AspireShop.Api.Orders.csproj" />
+    <ProjectReference Include="..\AspireShop.Web.Store\AspireShop.Web.Store.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Aspire.Hosting.EntityFrameworkCore" Version="13.6.0-preview.1.26479.8" />
     <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="13.6.0" />
+    <PackageReference Include="Aspire.Hosting.RabbitMQ" Version="13.6.0" />
     <PackageReference Include="Aspire.Hosting.Redis" Version="13.6.0" />
   </ItemGroup>
 

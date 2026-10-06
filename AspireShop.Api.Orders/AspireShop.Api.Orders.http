@@ -1,0 +1,6 @@
+@AspireShop.Api.Orders_HostAddress = http://localhost:5261
+
+GET {{AspireShop.Api.Orders_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

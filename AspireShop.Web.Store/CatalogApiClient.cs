@@ -29,6 +29,6 @@ public sealed class CatalogApiClient(HttpClient httpClient)
     }
 }
 
-public sealed record CreateCatalogProductRequest(string Name, decimal Price, int Stock);
+public sealed record CreateCatalogProductRequest(string Name, decimal Price, int Stock, string? ImageUrl = null);
 
-public sealed record CatalogProduct(Guid Id, string Name, decimal Price, int Stock);
+public sealed record CatalogProduct(Guid Id, string Name, string? ImageUrl, decimal Price, int Stock);

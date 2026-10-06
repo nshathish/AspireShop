@@ -1,5 +1,7 @@
 using AspireShop.Api.Catalog;
 using AspireShop.Api.Catalog.Api.Endpoints;
+using AspireShop.Api.Catalog.Application;
+using FluentValidation;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,8 +9,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults();
 
 builder.Services.AddProblemDetails();
+builder.Services.AddValidatorsFromAssemblyContaining<ApplicationAssemblyMarker>();
 
-builder.Services.AddCatalogInfrastructure(builder.Configuration);
+builder.Services.AddInfrastructureServices(builder.Configuration);
 
 builder.Services.AddOpenApi();
 
@@ -19,15 +22,13 @@ app.UseExceptionHandler();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
-    app.MapScalarApiReference(options =>
-    {
-        options.DarkMode = false;
-    });
+    app.MapScalarApiReference(options => { options.DarkMode = false; });
 }
 
 app.MapGet("/health", () => Results.Ok("Healthy"));
 
 app.MapProductEndpoints();
+app.MapCategoryEndpoints();
+app.MapProductPriceEndpoints();
 
 app.Run();
-

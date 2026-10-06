@@ -14,10 +14,18 @@ public sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
             .IsRequired()
             .HasMaxLength(200);
 
+        builder.Property(p => p.ImageUrl)
+            .HasMaxLength(2048);
+
         builder.Property(p => p.Price)
             .HasPrecision(18, 2);
 
         builder.Property(p => p.Stock)
             .IsRequired();
+
+        builder.HasOne(product => product.Category)
+            .WithMany(category => category.Products)
+            .HasForeignKey(product => product.CategoryId)
+            .OnDelete(DeleteBehavior.SetNull);
     }
 }

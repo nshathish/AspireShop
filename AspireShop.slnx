@@ -5,7 +5,8 @@
   </Folder>
   <Folder Name="/Src/">
     <Project Path="AspireShop.Api.Catalog/AspireShop.Api.Catalog.csproj" />
-    <Project Path="AspireShop.Web/AspireShop.Web.csproj" />
+    <Project Path="AspireShop.Api.Orders/AspireShop.Api.Orders.csproj" />
+    <Project Path="AspireShop.Web.Store/AspireShop.Web.Store.csproj" />
   </Folder>
   <Folder Name="/Tests/">
     <Project Path="AspireShop.Tests/AspireShop.Tests.csproj" />

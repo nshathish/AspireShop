@@ -1,5 +1,5 @@
 using AspireShop.Web;
-using AspireShop.Web.Components;
+using AspireShop.Web.Store.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
