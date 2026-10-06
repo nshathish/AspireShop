@@ -51,7 +51,7 @@ public static class ProductEndpoints
 
     private static async Task<Ok<List<ProductResponse>>> GetAllProducts(
         ProductService productService,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
         var results = await productService.GetAllAsync(cancellationToken);
         return TypedResults.Ok(results);
@@ -60,7 +60,7 @@ public static class ProductEndpoints
     private static async Task<Results<Ok<ProductResponse>, NotFound<ProblemDetails>>> GetProductById(
         Guid id,
         ProductService productService,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
         var product = await productService.GetByIdAsync(id, cancellationToken);
 
@@ -79,7 +79,7 @@ public static class ProductEndpoints
             CreateProductRequest request,
             IValidator<CreateProductRequest> validator,
             ProductService productService,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken)
     {
         var validationResult = await validator.ValidateAsync(request, cancellationToken);
         if (!validationResult.IsValid)
@@ -104,7 +104,7 @@ public static class ProductEndpoints
         Guid id,
         CreateProductRequest request,
         ProductService productService,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
         var result = await productService.UpdateAsync(id, request, cancellationToken);
 
@@ -128,7 +128,7 @@ public static class ProductEndpoints
     private static async Task<Results<NoContent, NotFound<ProblemDetails>>> DeleteProduct(
         Guid id,
         ProductService productService,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
         var result = await productService.DeleteAsync(id, cancellationToken);
 

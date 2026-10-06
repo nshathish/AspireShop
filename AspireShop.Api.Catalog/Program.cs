@@ -1,5 +1,6 @@
 using AspireShop.Api.Catalog;
 using AspireShop.Api.Catalog.Api.Endpoints;
+using AspireShop.Api.Catalog.Api.Middleware;
 using AspireShop.Api.Catalog.Application;
 using AspireShop.Api.Catalog.Common;
 using FluentValidation;
@@ -18,7 +19,10 @@ builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
+app.UseMiddleware<RequestCancellationMiddleware>();
+
 app.UseExceptionHandler();
+
 app.UseCors(CorsPolicies.Admin);
 
 if (app.Environment.IsDevelopment())
@@ -26,6 +30,8 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
     app.MapScalarApiReference(options => { options.DarkMode = false; });
 }
+
+app.UseHttpsRedirection();
 
 app.MapGet("/health", () => Results.Ok("Healthy"));
 
